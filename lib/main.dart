@@ -6,9 +6,11 @@ import 'package:flame/game.dart';
 import './game/game.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   Flame.device.fullScreen();
   Flame.device.setPortrait();
 
   final game = TetrisGame();
-  runApp(GameWidget(game: kDebugMode ? game : TetrisGame()));
+  // runApp(GameWidget(game: kDebugMode ? game : TetrisGame()));
+  runApp(GameWidget(game: game));
 }
