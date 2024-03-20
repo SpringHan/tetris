@@ -17,7 +17,7 @@ class TetrisGame extends FlameGame {
     cam = CameraComponent.withFixedResolution(
       world: backgroundScreen,
       width: 1184,
-      height: 1408
+      height: 2080
     );
     cam.viewfinder.anchor = Anchor.topLeft;
 
