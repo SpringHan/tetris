@@ -7,13 +7,13 @@ import './world.dart';
 
 class TetrisGame extends FlameGame {
   late final CameraComponent cam;
-
-  final backgroundScreen = Screen();
+  late final Screen backgroundScreen;
 
   @override
   FutureOr<void> onLoad() async {
     await images.loadAllImages();
 
+    backgroundScreen = Screen();
     cam = CameraComponent.withFixedResolution(
       world: backgroundScreen,
       width: 1184,

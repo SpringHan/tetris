@@ -9,6 +9,12 @@ enum BlockState {
   moveless
 }
 
+enum MoveCommand {
+  left,
+  right,
+  none
+}
+
 class BlockSprite extends SpriteComponent
 with HasWorldReference<Screen> {
   BlockSprite({
@@ -24,7 +30,9 @@ with HasWorldReference<Screen> {
 
   final String blockImage;
 
-  double movingSpeed = 8;
+  bool speedUp = false;
+  bool moveLock = false;
+  double movingSpeed = 64;
   BlockState blockState = BlockState.falling;
 
   @override
@@ -37,18 +45,49 @@ with HasWorldReference<Screen> {
 
   @override
   void update(double dt) {
+    _detectDirection();
     _updateBlockMovement();
     super.update(dt);
   }
 
   void _updateBlockMovement() {
-    if (blockState == BlockState.falling) {
-      if (position.y == world.blockObjects.last.y) {
-        blockState = BlockState.moveless;
-        return;
-      }
+    if (blockState == BlockState.moveless) return;
 
-      position += Vector2(0, movingSpeed);
+    if (world.delayTime != 0) {
+      // TODO: Add support for horizontal movement
+      if (moveLock) moveLock = false;
+      return;
     }
+
+    if (moveLock) return;
+
+    // TODO: To be modified.
+    if (position.y == world.borders[1]) {
+      blockState = BlockState.moveless;
+      return;
+    }
+
+    position += Vector2(0, movingSpeed);
+    moveLock = true;
+  }
+
+  void _detectDirection() {
+    var move = 0.0;
+    switch (world.moveCommand) {
+      case MoveCommand.left:
+      if (position.x == world.borders[2]
+        // || ...
+      ) return;
+      move = -64.0;
+      break;
+      case MoveCommand.right:
+      if (position.x == world.borders[3]) return;
+      move = 64.0;
+      default:
+      return;
+    }
+
+    position += Vector2(move, 0);
+    world.moveCommand = MoveCommand.none;
   }
 }

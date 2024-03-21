@@ -11,17 +11,25 @@
     "fileStates": {
         "Main.tmx": {
             "expandedObjectLayers": [
-                2
+                3
             ],
-            "scale": 0.25,
+            "scale": 0.33,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 630.3030303030304,
+                "y": 1784.8484848484848
+            }
+        },
+        "Test.tmx": {
+            "scale": 0.3178846153846153,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 348,
-                "y": 1004
+                "x": 591.4095583787055,
+                "y": 1434.48275862069
             }
         },
         "Tetris.tsx": {
-            "scaleInDock": 0.5,
+            "scaleInDock": 0.33,
             "scaleInEditor": 0.33
         },
         "_Main.tmx": {
@@ -50,6 +58,7 @@
     "recentFiles": [
         "Tetris.tsx",
         "Main.tmx",
+        "Test.tmx",
         "_Main.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
