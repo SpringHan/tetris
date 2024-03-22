@@ -13,11 +13,11 @@
             "expandedObjectLayers": [
                 3
             ],
-            "scale": 0.33,
-            "selectedLayer": 1,
+            "scale": 0.5,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 630.3030303030304,
-                "y": 1784.8484848484848
+                "x": 548,
+                "y": 652
             }
         },
         "Test.tmx": {

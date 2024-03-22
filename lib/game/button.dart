@@ -2,7 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 
 import './world.dart';
-import './block.dart' show MoveCommand;
+import './tetromino.dart' show MoveCommand;
 
 class RedirectionButton extends PositionComponent
 with HasWorldReference<Screen>, TapCallbacks {

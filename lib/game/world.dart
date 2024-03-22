@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 
+import './tetromino.dart';
 import './block.dart';
 import './button.dart';
 
@@ -11,12 +12,13 @@ class Screen extends World {
   late TiledComponent backgroundScreen;
   late List<TiledObject> blockObjects;
   final List<TiledObject> nextBlockList = [];
+  final List<int> tetrisEmulator = List.filled(200, 0);
 
   double delayTime = 0.5;
   int currentBlocks = 0;
   int blocksFinished = 0;       // The number of blocks which finished current dropping.
   final List<double> borders = [];
-  final List<BlockSprite> blockList = [];
+  final List<Tetromino> tetrominoList = [];
   MoveCommand moveCommand = MoveCommand.none;
 
   @override
@@ -27,15 +29,15 @@ class Screen extends World {
     _initBorders();
     _initButtons();
 
-    final test = blockObjects[0];
-    final blockSprite = BlockSprite(
-      position: Vector2(test.x, test.y),
-      blockImage: _getNewBlock(),
+    final newBlock = _getNewBlock();
+    final test = Tetromino(
+      tetroType: newBlock,
+      blockImage: _blockImage(newBlock),
     );
 
     addAll([
         backgroundScreen,
-        blockSprite
+        test
     ]);
     super.onLoad();
   }
