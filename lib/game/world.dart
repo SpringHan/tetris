@@ -5,18 +5,21 @@ import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 
 import './tetromino.dart';
-import './block.dart';
 import './button.dart';
 
 class Screen extends World {
+  // Basic variables.
   late TiledComponent backgroundScreen;
   late List<TiledObject> blockObjects;
-  final List<TiledObject> nextBlockList = [];
-  final List<int> tetrisEmulator = List.filled(200, 0);
+  List<int> tetrisEmulator = List.filled(200, 0, growable: true);
 
-  double delayTime = 0.5;
+  // TODO: Init this.
+  final List<TiledObject> nextBlockObjects = [];
+
+  (int, int)? moveLines;               // Lines to move down. Used after clearing full lines.
   int currentBlocks = 0;
   int blocksFinished = 0;       // The number of blocks which finished current dropping.
+  List<int> blocksBeRemoved = []; // The idx of blocks to be removed.
   final List<double> borders = [];
   final List<Tetromino> tetrominoList = [];
   MoveCommand moveCommand = MoveCommand.none;
@@ -40,18 +43,6 @@ class Screen extends World {
         test
     ]);
     super.onLoad();
-  }
-
-  @override
-  void update(double dt) {
-    if (delayTime == 0) {
-      delayTime = 0.5;
-    } else {
-      delayTime -= dt;
-      if (delayTime < 0) delayTime = 0;
-    }
-
-    super.update(dt);
   }
 
   void _initBorders() {
@@ -81,11 +72,78 @@ class Screen extends World {
     addAll(buttons);
   }
 
-  void generateBlock() {
-    final newBlock = _getNewBlock();
+  // TODO: This function should even be executed when creating a tetromino.
+  bool noObstacle(List<int> positions) {
+    for (final p in positions) {
+      if (tetrisEmulator[p] == 1) return false;
+    }
+
+    return true;
   }
 
-  void resetAttris() {
+  // TODO: Next
+  void updateEmulator(List<int> positions) {
+  }
+
+  // When there're lines filled with blocks, clear these lines and make other blocks down.
+  void checkLines() {
+    // Used to avoid the disturbance of empty lines that were not
+    // added to newEmulator for the check of item numbers.
+    int? emptyLineNum;
+
+    int? splitItem;
+    List<int> newEmulator = [];
+
+    blocksBeRemoved.clear();
+
+    for (var i = 199; i >= 0; i -= 10) {
+      List<int> temp = [];
+      var emptyLine = true;
+      var hasEmptyBlock = false;
+
+      for (var j = i; j > i - 10; j--) {
+        if (tetrisEmulator[j] == 0) {
+          if (hasEmptyBlock) hasEmptyBlock = true;
+        } else if (emptyLine) {
+          emptyLine = false;
+        }
+
+        temp.insert(0, tetrisEmulator[j]);
+      }
+
+      if (!hasEmptyBlock) {
+        splitItem ??= i - 10;
+        blocksBeRemoved.addAll(List.generate(10, (index) => i - index));
+        continue;
+      }
+      // When noticing that current line is an empty line, return current line number.
+      if (emptyLine) {
+        emptyLineNum = (i + 1) ~/ 10;
+        break;
+      }
+
+      newEmulator.insertAll(0, temp);
+    }
+
+    var remainingItems = emptyLineNum != null
+    ? newEmulator.length + emptyLineNum * 10
+    : newEmulator.length;
+
+    // Avoid extra cost.
+    if (remainingItems == 200) return;
+
+    moveLines = (splitItem!, 20 - remainingItems ~/ 10);
+
+    final List<int> emptyBlocks = List.filled(
+      200 - newEmulator.length,
+      0
+    );
+    tetrisEmulator = [...emptyBlocks, ...newEmulator];
+  }
+
+  void removeEmptyTetro(Tetromino object) {
+    remove(object);
+    tetrominoList.remove(object);
   }
 }
 
@@ -95,6 +153,13 @@ String _blockImage(String block) {
 
 String _getNewBlock() {
   return blockTypes[Random().nextInt(7)]!;
+}
+
+// NOTE: As the check of the occupation of blocks is executed
+// after boundary check, there's no need to care about overflow here.
+int makeEmuPos(int idx, {double x = 0, double y = 0}) {
+  idx += x.toInt() + 10 * y.toInt();
+  return idx;
 }
 
 final blockTypes = <int, String> {

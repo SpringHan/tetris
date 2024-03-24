@@ -24,11 +24,14 @@ class Tetromino extends Component with HasWorldReference<Screen> {
 
   final String tetroType;
   final String blockImage;
+  int remainingBlocks = 4;
 
   List<double> blockBoundaries = [];
 
   bool moveLock = false;
+  bool deletedFullLines = false;
   double delayTime = 0.5;
+  List<int> positionInEmu = []; // The position in emulator array.
   List<BlockSprite> blocks = [];
   TetrominoState state = TetrominoState.falling;
 
@@ -44,6 +47,7 @@ class Tetromino extends Component with HasWorldReference<Screen> {
     )).toList();
 
     _initBoundaries();
+    positionInEmu = _newEmuPosition(init: true);
 
     addAll(blocks);
     super.onLoad();
@@ -51,6 +55,13 @@ class Tetromino extends Component with HasWorldReference<Screen> {
 
   @override
   void update(double dt) {
+    if (world.blocksBeRemoved.isNotEmpty) {
+      if (!deletedFullLines) _removeFullLines();
+      return;
+    } else if (deletedFullLines) {
+      deletedFullLines = false;
+    }
+
     _updateFalling();
   }
 
@@ -82,6 +93,60 @@ class Tetromino extends Component with HasWorldReference<Screen> {
       xList.reduce(min),
       xList.reduce(max)
     ];
+  }
+
+  // NOTE: This function can only be called when the tetromino is falling.
+  List<int> _newEmuPosition({
+      bool init = false,
+      double x = 0,
+      double y = 0,
+  }) {
+    final List<int> temp = [];
+
+    if (init) {
+      temp.add(4);
+    } else {
+      temp.add(makeEmuPos(positionInEmu[0], x: x, y: y));
+    }
+
+    for (final e in tetrominoMap[tetroType]!) {
+      if (e == Vector2(0, 0)) continue;
+      temp.add(makeEmuPos(
+          temp[0],
+          x: e.x,
+          y: e.y
+      ));
+    }
+
+    return temp;
+  }
+
+  // Remove the blocks included in full lines. Then move remaining blocks down.
+  void _removeFullLines() {
+    for (var i = 0; i < 4; i++) {
+      final tempPosition = positionInEmu[i];
+      if (world.blocksBeRemoved.contains(tempPosition)) {
+        world.blocksBeRemoved.remove(tempPosition);
+        remove(blocks[i]);
+        remainingBlocks--;
+        continue;
+      }
+
+      if (tempPosition <= world.moveLines!.$1) {
+        blocks[i].moveDown(times: world.moveLines!.$2 as double);
+        positionInEmu[i] += world.moveLines!.$2 * 10;
+      }
+    }
+
+    deletedFullLines = true;
+    if (remainingBlocks == 0) {
+      world.removeEmptyTetro(this);
+    }
+  }
+
+  void _beMoveless() {
+    state = TetrominoState.moveless;
+    blockBoundaries.clear();
   }
 }
 

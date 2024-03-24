@@ -36,8 +36,8 @@ with HasWorldReference<Screen> {
   //   super.update(dt);
   // }
 
-  void moveDown() {
-    position += Vector2(0, 64);
+  void moveDown({double times = 1}) {
+    position += Vector2(0, 64 * times);
     // if (blockState == BlockState.moveless) return;
 
     // if (world.delayTime != 0) {
