@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flame/components.dart';
@@ -24,9 +25,7 @@ class Tetromino extends Component with HasWorldReference<Screen> {
 
   final String tetroType;
   final String blockImage;
-  int remainingBlocks = 4;
-
-  List<double> blockBoundaries = [];
+  final List<int> remainingBlocks = [0, 1, 2, 3];
 
   bool moveLock = false;
   bool deletedFullLines = false;
@@ -36,7 +35,7 @@ class Tetromino extends Component with HasWorldReference<Screen> {
   TetrominoState state = TetrominoState.falling;
 
   @override
-  Future<void> onLoad() async {
+  FutureOr<void> onLoad() async {
     final positions = tetrominoMap[tetroType]!;
     final targetObject = world.blockObjects[4];
     final targetPosition = Vector2(targetObject.x, targetObject.y);
@@ -46,11 +45,9 @@ class Tetromino extends Component with HasWorldReference<Screen> {
         position: targetPosition + e * 64
     )).toList();
 
-    _initBoundaries();
     positionInEmu = _newEmuPosition(init: true);
 
     addAll(blocks);
-    super.onLoad();
   }
 
   @override
@@ -62,33 +59,67 @@ class Tetromino extends Component with HasWorldReference<Screen> {
       deletedFullLines = false;
     }
 
-    _updateFalling();
+    _updateFalling(dt);
   }
 
-  void _updateFalling() {
+  @override
+  void onRemove() {
+    for (final i in remainingBlocks) {
+      remove(blocks[i]);
+    }
+  }
+
+  void _updateFalling(double dt) {
     if (state == TetrominoState.moveless) return;
+
+    if (delayTime > 0) {
+      // if (moveLock) moveLock = false;
+      delayTime -= dt;
+      return;
+    }
+
+    // if (moveLock) return;
+
+    final newBoundaries = _newBoundaries(y: 1);
+    final newPosition = _newEmuPosition(y: 1);
+
+    if (!_canMove(newBoundaries, newPosition)) {
+      _beMoveless();
+      return;
+    }
+
+    for (final b in blocks) {
+      b.moveDown();
+    }
+    positionInEmu = newPosition;
+
+    delayTime = 0.5;
   }
 
-  // NOTE: Check all the details then deciding whether current movement can be executed.
-  bool _canMove(bool horizontal) {
-    // TODO: To be modified.
-    if (horizontal) {
+  // NOTE: Check all the details then deciding
+  // whether current movement can be executed.
+  bool _canMove(List<double> boundaries, List<int> position) {
+    if (boundaries[0] > world.borders[1]
+      || boundaries[1] < world.borders[2]
+      || boundaries[2] > world.borders[3]) return false;
+
+    for (final p in position) {
+      if (world.tetrisEmulator[p] == 1) return false;
     }
 
     return true;
   }
 
   // NOTE: Call this function after calling rotate.
-  void _initBoundaries() {
+  List<double> _newBoundaries({double x = 0, double y = 0}) {
     final List<double> xList = [];
     final List<double> yList = [];
     for (final block in blocks) {
-      xList.add(block.x);
-      yList.add(block.y);
+      xList.add(block.x + x * 64);
+      yList.add(block.y + y * 64);
     }
 
-    blockBoundaries = [
-      yList.reduce(min),
+    return [
       yList.reduce(max),
       xList.reduce(min),
       xList.reduce(max)
@@ -128,7 +159,7 @@ class Tetromino extends Component with HasWorldReference<Screen> {
       if (world.blocksBeRemoved.contains(tempPosition)) {
         world.blocksBeRemoved.remove(tempPosition);
         remove(blocks[i]);
-        remainingBlocks--;
+        remainingBlocks.remove(i);
         continue;
       }
 
@@ -139,22 +170,13 @@ class Tetromino extends Component with HasWorldReference<Screen> {
     }
 
     deletedFullLines = true;
-    if (remainingBlocks == 0) {
+    if (remainingBlocks.isEmpty) {
       world.removeEmptyTetro(this);
     }
   }
 
   void _beMoveless() {
     state = TetrominoState.moveless;
-    blockBoundaries.clear();
+    world.tetrominoFinished++;
   }
 }
-
-final tetrominoMap = <String, List<Vector2>> {
-  "I": [Vector2(0, 0), Vector2(0, 1), Vector2(0, 2), Vector2(0, 3)],
-  "O": [Vector2(0, 0), Vector2(0, 1), Vector2(1, 0), Vector2(1, 1)],
-  "J": [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)],
-  "L": [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)],
-  "Z": [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
-  "S": [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 1)],
-};

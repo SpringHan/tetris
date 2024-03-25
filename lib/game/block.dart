@@ -2,60 +2,23 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 
-import './world.dart';
-
-class BlockSprite extends SpriteComponent
-with HasWorldReference<Screen> {
+class BlockSprite extends SpriteComponent {
   BlockSprite({
-      int? priority,
+      super.priority,
       required super.position,
       required this.blockImage
-  })
-  {
-    if (priority != null) {
-      this.priority = priority;
-    }
-  }
+  });
 
   final String blockImage;
   
-  double movingSpeed = 64;
-
   @override
   FutureOr<void> onLoad() async {
     size = Vector2.all(64.0);
     sprite = await Sprite.load(blockImage);
-
-    super.onLoad();
   }
-
-  // @override
-  // void update(double dt) {
-  //   _detectDirection();
-  //   _updateBlockMovement();
-  //   super.update(dt);
-  // }
 
   void moveDown({double times = 1}) {
     position += Vector2(0, 64 * times);
-    // if (blockState == BlockState.moveless) return;
-
-    // if (world.delayTime != 0) {
-    //   // TODO: Add support for horizontal movement
-    //   if (moveLock) moveLock = false;
-    //   return;
-    // }
-
-    // if (moveLock) return;
-
-    // // TODO: To be modified.
-    // if (position.y == world.borders[1]) {
-    //   blockState = BlockState.moveless;
-    //   return;
-    // }
-
-    // position += Vector2(0, movingSpeed);
-    // moveLock = true;
   }
 
   void moveHorizontal(bool left) {
@@ -84,3 +47,13 @@ with HasWorldReference<Screen> {
     // world.moveCommand = MoveCommand.none;
   }
 }
+
+final tetrominoMap = <String, List<Vector2>> {
+  "I": [Vector2(0, 0), Vector2(0, 1), Vector2(0, 2), Vector2(0, 3)],
+  "O": [Vector2(0, 0), Vector2(0, 1), Vector2(1, 0), Vector2(1, 1)],
+  "J": [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)],
+  "L": [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)],
+  "Z": [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
+  "S": [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 1)],
+  "T": [Vector2(0, 0), Vector2(0, 1), Vector2(-1, 1), Vector2(1, 1)],
+};

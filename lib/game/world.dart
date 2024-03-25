@@ -9,26 +9,30 @@ import './button.dart';
 
 class Screen extends World {
   // Basic variables.
-  late TiledComponent backgroundScreen;
+  bool _running = true;
   late List<TiledObject> blockObjects;
+  late TiledComponent _backgroundScreen;
   List<int> tetrisEmulator = List.filled(200, 0, growable: true);
 
   // TODO: Init this.
   final List<TiledObject> nextBlockObjects = [];
 
-  (int, int)? moveLines;               // Lines to move down. Used after clearing full lines.
-  int currentBlocks = 0;
-  int blocksFinished = 0;       // The number of blocks which finished current dropping.
+  (int, int)? moveLines; // Lines to move down. Used after clearing full lines.
   List<int> blocksBeRemoved = []; // The idx of blocks to be removed.
+
+  // The number of tetromino which finished current dropping.
+  int tetrominoFinished = 0;
+
   final List<double> borders = [];
   final List<Tetromino> tetrominoList = [];
+  late Tetromino nextTetromino;
   MoveCommand moveCommand = MoveCommand.none;
 
   @override
   FutureOr<void> onLoad() async {
-    backgroundScreen = await TiledComponent.load("Main.tmx", Vector2.all(16));
+    _backgroundScreen = await TiledComponent.load("Main.tmx", Vector2.all(16));
 
-    blockObjects = backgroundScreen.tileMap.getLayer<ObjectGroup>("Block")!.objects;
+    blockObjects = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Block")!.objects;
     _initBorders();
     _initButtons();
 
@@ -39,10 +43,19 @@ class Screen extends World {
     );
 
     addAll([
-        backgroundScreen,
+        _backgroundScreen,
         test
     ]);
-    super.onLoad();
+  }
+
+  @override
+  void update(double dt) {
+    if (!_running) return;
+
+    if (tetrominoFinished == tetrominoList.length) {
+      tetrominoList.add(nextTetromino);
+      // TODO: Call the function: create new nextTetromino and display it.
+    }
   }
 
   void _initBorders() {
@@ -55,7 +68,7 @@ class Screen extends World {
   }
 
   void _initButtons() {
-    final buttonList = backgroundScreen.tileMap.getLayer<ObjectGroup>("Button")!.objects;
+    final buttonList = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Button")!.objects;
 
     List<PositionComponent> buttons = [];
     buttons.add(RedirectionButton(
@@ -144,6 +157,10 @@ class Screen extends World {
   void removeEmptyTetro(Tetromino object) {
     remove(object);
     tetrominoList.remove(object);
+  }
+
+  void gameOver() {
+    _running = false;
   }
 }
 

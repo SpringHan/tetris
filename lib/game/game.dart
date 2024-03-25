@@ -22,8 +22,6 @@ class TetrisGame extends FlameGame {
     cam.viewfinder.anchor = Anchor.topLeft;
 
     addAll([cam, backgroundScreen]);
-
-    return super.onLoad();
   }
 
   // @override
