@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 
 import './world.dart';
 import './block.dart';
+import './display_tetro.dart';
 
 enum TetrominoState {
   falling,
@@ -17,14 +18,16 @@ enum MoveCommand {
   none
 }
 
-class Tetromino extends Component with HasWorldReference<Screen> {
-  Tetromino({
-      required this.tetroType,
-      required this.blockImage,
-  });
+class Tetromino extends Component
+with HasWorldReference<Screen> {
+  Tetromino(DisplayTetromino dTetro)
+  : tetroType = dTetro.tetroType {
+    blocks = dTetro.blocks;
+    remove(dTetro);
+  }
 
   final String tetroType;
-  final String blockImage;
+  // final String blockImage;
   final List<int> remainingBlocks = [0, 1, 2, 3];
 
   bool moveLock = false;
@@ -40,12 +43,14 @@ class Tetromino extends Component with HasWorldReference<Screen> {
     final targetObject = world.blockObjects[4];
     final targetPosition = Vector2(targetObject.x, targetObject.y);
 
-    blocks = positions.map((e) => BlockSprite(
-        blockImage: blockImage,
-        position: targetPosition + e * 64
-    )).toList();
+    for (var i = 0; i <= 3; i++) {
+      blocks[i].position = targetPosition + positions[i] * 64;
+    }
 
-    positionInEmu = _newEmuPosition(init: true);
+    positionInEmu = world.newEmuPosition(
+      init: 4,
+      tetroType: tetroType
+    );
 
     addAll(blocks);
   }
@@ -81,7 +86,11 @@ class Tetromino extends Component with HasWorldReference<Screen> {
     // if (moveLock) return;
 
     final newBoundaries = _newBoundaries(y: 1);
-    final newPosition = _newEmuPosition(y: 1);
+    final newPosition = world.newEmuPosition(
+      y: 1,
+      tetroType: tetroType,
+      positions: positionInEmu
+    );
 
     if (!_canMove(newBoundaries, newPosition)) {
       _beMoveless();
@@ -124,32 +133,6 @@ class Tetromino extends Component with HasWorldReference<Screen> {
       xList.reduce(min),
       xList.reduce(max)
     ];
-  }
-
-  // NOTE: This function can only be called when the tetromino is falling.
-  List<int> _newEmuPosition({
-      bool init = false,
-      double x = 0,
-      double y = 0,
-  }) {
-    final List<int> temp = [];
-
-    if (init) {
-      temp.add(4);
-    } else {
-      temp.add(makeEmuPos(positionInEmu[0], x: x, y: y));
-    }
-
-    for (final e in tetrominoMap[tetroType]!) {
-      if (e == Vector2(0, 0)) continue;
-      temp.add(makeEmuPos(
-          temp[0],
-          x: e.x,
-          y: e.y
-      ));
-    }
-
-    return temp;
   }
 
   // Remove the blocks included in full lines. Then move remaining blocks down.

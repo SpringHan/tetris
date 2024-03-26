@@ -6,6 +6,7 @@ import 'package:flame_tiled/flame_tiled.dart';
 
 import './tetromino.dart';
 import './button.dart';
+import './block.dart' show tetrominoMap;
 
 class Screen extends World {
   // Basic variables.
@@ -37,14 +38,14 @@ class Screen extends World {
     _initButtons();
 
     final newBlock = _getNewBlock();
-    final test = Tetromino(
-      tetroType: newBlock,
-      blockImage: _blockImage(newBlock),
-    );
+    // final test = Tetromino(
+    //   tetroType: newBlock,
+    //   blockImage: _blockImage(newBlock),
+    // );
 
     addAll([
         _backgroundScreen,
-        test
+        // test
     ]);
   }
 
@@ -157,6 +158,34 @@ class Screen extends World {
   void removeEmptyTetro(Tetromino object) {
     remove(object);
     tetrominoList.remove(object);
+  }
+
+  // NOTE: When `init` is null, `positions` must be non-null.
+  List<int> newEmuPosition({
+      int? init,
+      double x = 0,
+      double y = 0,
+      List<int>? positions,
+      required String tetroType,
+  }) {
+    final List<int> temp = [];
+
+    if (init != null) {
+      temp.add(init);
+    } else {
+      temp.add(makeEmuPos(positions![0], x: x, y: y));
+    }
+
+    for (final e in tetrominoMap[tetroType]!) {
+      if (e == Vector2(0, 0)) continue;
+      temp.add(makeEmuPos(
+          temp[0],
+          x: e.x,
+          y: e.y
+      ));
+    }
+
+    return temp;
   }
 
   void gameOver() {

@@ -21,30 +21,13 @@ class BlockSprite extends SpriteComponent {
     position += Vector2(0, 64 * times);
   }
 
-  void moveHorizontal(bool left) {
+  void moveHorizontal({required bool left}) {
     if (left) {
       position -= Vector2(64, 0);
       return;
     }
 
     position += Vector2(64, 0);
-    // var move = 0.0;
-    // switch (world.moveCommand) {
-    //   case MoveCommand.left:
-    //   if (position.x == world.borders[2]
-    //     // || ...
-    //   ) return;
-    //   move = -64.0;
-    //   break;
-    //   case MoveCommand.right:
-    //   if (position.x == world.borders[3]) return;
-    //   move = 64.0;
-    //   default:
-    //   return;
-    // }
-
-    // position += Vector2(move, 0);
-    // world.moveCommand = MoveCommand.none;
   }
 }
 
