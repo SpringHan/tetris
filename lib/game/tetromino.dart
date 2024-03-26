@@ -23,11 +23,9 @@ with HasWorldReference<Screen> {
   Tetromino(DisplayTetromino dTetro)
   : tetroType = dTetro.tetroType {
     blocks = dTetro.blocks;
-    remove(dTetro);
   }
 
   final String tetroType;
-  // final String blockImage;
   final List<int> remainingBlocks = [0, 1, 2, 3];
 
   bool moveLock = false;
@@ -52,11 +50,18 @@ with HasWorldReference<Screen> {
       tetroType: tetroType
     );
 
+    if (!_canMove([], positionInEmu)) {
+      remainingBlocks.clear();
+      world.changeRunningState();
+    }
+
     addAll(blocks);
   }
 
   @override
   void update(double dt) {
+    if (moveLock) return;
+
     if (world.blocksBeRemoved.isNotEmpty) {
       if (!deletedFullLines) _removeFullLines();
       return;
@@ -78,18 +83,15 @@ with HasWorldReference<Screen> {
     if (state == TetrominoState.moveless) return;
 
     if (delayTime > 0) {
-      // if (moveLock) moveLock = false;
       delayTime -= dt;
       return;
     }
-
-    // if (moveLock) return;
 
     final newBoundaries = _newBoundaries(y: 1);
     final newPosition = world.newEmuPosition(
       y: 1,
       tetroType: tetroType,
-      positions: positionInEmu
+      positions: positionInEmu,
     );
 
     if (!_canMove(newBoundaries, newPosition)) {
@@ -108,9 +110,12 @@ with HasWorldReference<Screen> {
   // NOTE: Check all the details then deciding
   // whether current movement can be executed.
   bool _canMove(List<double> boundaries, List<int> position) {
-    if (boundaries[0] > world.borders[1]
-      || boundaries[1] < world.borders[2]
-      || boundaries[2] > world.borders[3]) return false;
+    // When initialize tetromino, boundaries can be empty.
+    if (boundaries.isNotEmpty) {
+      if (boundaries[0] > world.borders[1]
+        || boundaries[1] < world.borders[2]
+        || boundaries[2] > world.borders[3]) return false;
+    }
 
     for (final p in position) {
       if (world.tetrisEmulator[p] == 1) return false;
@@ -147,7 +152,7 @@ with HasWorldReference<Screen> {
       }
 
       if (tempPosition <= world.moveLines!.$1) {
-        blocks[i].moveDown(times: world.moveLines!.$2 as double);
+        blocks[i].moveDown(times: world.moveLines!.$2.toDouble());
         positionInEmu[i] += world.moveLines!.$2 * 10;
       }
     }
@@ -159,7 +164,13 @@ with HasWorldReference<Screen> {
   }
 
   void _beMoveless() {
+    // Record positions of moveless blocks.
+    for (final p in positionInEmu) {
+      world.tetrisEmulator[p] = 1;
+    }
+
     state = TetrominoState.moveless;
     world.tetrominoFinished++;
+    world.checkLines();
   }
 }

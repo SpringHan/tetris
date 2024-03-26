@@ -40,9 +40,4 @@ with HasWorldReference<Screen> {
 
     addAll(blocks);
   }
-
-  @override
-  void onRemove() {
-    removeAll(blocks);
-  }
 }

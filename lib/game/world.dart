@@ -6,17 +6,16 @@ import 'package:flame_tiled/flame_tiled.dart';
 
 import './tetromino.dart';
 import './button.dart';
+import './display_tetro.dart';
 import './block.dart' show tetrominoMap;
 
 class Screen extends World {
   // Basic variables.
   bool _running = true;
-  late List<TiledObject> blockObjects;
-  late TiledComponent _backgroundScreen;
+  late final List<TiledObject> blockObjects;
+  late final TiledComponent _backgroundScreen;
+  late final List<TiledObject> nextBlockObjects;
   List<int> tetrisEmulator = List.filled(200, 0, growable: true);
-
-  // TODO: Init this.
-  final List<TiledObject> nextBlockObjects = [];
 
   (int, int)? moveLines; // Lines to move down. Used after clearing full lines.
   List<int> blocksBeRemoved = []; // The idx of blocks to be removed.
@@ -26,7 +25,7 @@ class Screen extends World {
 
   final List<double> borders = [];
   final List<Tetromino> tetrominoList = [];
-  late Tetromino nextTetromino;
+  DisplayTetromino? nextTetromino;
   MoveCommand moveCommand = MoveCommand.none;
 
   @override
@@ -34,19 +33,12 @@ class Screen extends World {
     _backgroundScreen = await TiledComponent.load("Main.tmx", Vector2.all(16));
 
     blockObjects = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Block")!.objects;
+    nextBlockObjects = _backgroundScreen.tileMap.getLayer<ObjectGroup>("NextBlock")!.objects;
+
     _initBorders();
     _initButtons();
 
-    final newBlock = _getNewBlock();
-    // final test = Tetromino(
-    //   tetroType: newBlock,
-    //   blockImage: _blockImage(newBlock),
-    // );
-
-    addAll([
-        _backgroundScreen,
-        // test
-    ]);
+    add(_backgroundScreen);
   }
 
   @override
@@ -54,8 +46,12 @@ class Screen extends World {
     if (!_running) return;
 
     if (tetrominoFinished == tetrominoList.length) {
-      tetrominoList.add(nextTetromino);
-      // TODO: Call the function: create new nextTetromino and display it.
+      if (nextTetromino != null) {
+        tetrominoList.add(Tetromino(nextTetromino!));
+        add(tetrominoList.last);
+        remove(nextTetromino!);
+      }
+      _newTetromino();
     }
   }
 
@@ -86,17 +82,15 @@ class Screen extends World {
     addAll(buttons);
   }
 
-  // TODO: This function should even be executed when creating a tetromino.
-  bool noObstacle(List<int> positions) {
-    for (final p in positions) {
-      if (tetrisEmulator[p] == 1) return false;
-    }
+  void _newTetromino() {
+    final tetroType = _getNewBlock();
 
-    return true;
-  }
+    nextTetromino = DisplayTetromino(
+      tetroType: tetroType,
+      blockImage: _blockImage(tetroType),
+    );
 
-  // TODO: Next
-  void updateEmulator(List<int> positions) {
+    add(nextTetromino!);
   }
 
   // When there're lines filled with blocks, clear these lines and make other blocks down.
@@ -117,7 +111,7 @@ class Screen extends World {
 
       for (var j = i; j > i - 10; j--) {
         if (tetrisEmulator[j] == 0) {
-          if (hasEmptyBlock) hasEmptyBlock = true;
+          if (!hasEmptyBlock) hasEmptyBlock = true;
         } else if (emptyLine) {
           emptyLine = false;
         }
@@ -188,8 +182,36 @@ class Screen extends World {
     return temp;
   }
 
-  void gameOver() {
+  // Pause the game or not.
+  void changeRunningState() {
+    if (_running) {
+      _running = false;
+      tetrominoList.last.moveLock = true;
+    } else {
+      _running = true;
+      tetrominoList.last.moveLock = false;
+    }
+  }
+
+  void resetGame() {
     _running = false;
+
+    for (final tetro in tetrominoList) {
+      if (!tetro.isRemoved) remove(tetro);
+    }
+
+    if (nextTetromino != null
+      && !nextTetromino!.isRemoved) remove(nextTetromino!);
+
+    moveLines = null;
+    blocksBeRemoved.clear();
+
+    nextTetromino = null;
+    tetrominoFinished = 0;
+    tetrominoList.clear();
+    moveCommand = MoveCommand.none;
+    tetrisEmulator = List.filled(200, 0, growable: true);
+    _running = true;
   }
 }
 
