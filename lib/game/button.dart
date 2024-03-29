@@ -20,14 +20,44 @@ with HasWorldReference<Screen>, TapCallbacks {
   }
 }
 
-class SpeedUpButton extends PositionComponent
+class StateCtrlButton extends PositionComponent
 with HasWorldReference<Screen>, TapCallbacks {
-  SpeedUpButton({
+  StateCtrlButton({
       required super.size,
       required super.position,
+      required this.func,
   });
+
+  final void Function() func;
 
   @override
   void onTapDown(TapDownEvent event) {
+    func();
   }
 }
+
+// class PauseButton extends PositionComponent
+// with HasWorldReference<Screen>, TapCallbacks {
+//   PauseButton({
+//       required super.size,
+//       required super.position,
+//   });
+
+//   @override
+//   void onTapDown(TapDownEvent event) {
+//     world.changeRunningState();
+//   }
+// }
+
+// class ResetButton extends PositionComponent
+// with HasWorldReference<Screen>, TapCallbacks {
+//   ResetButton({
+//       required super.size,
+//       required super.position,
+//   });
+
+//   @override
+//   void onTapDown(TapDownEvent event) {
+//     world.resetGame();
+//   }
+// }

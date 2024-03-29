@@ -11,7 +11,10 @@ import './block.dart' show tetrominoMap;
 
 class Screen extends World {
   // Basic variables.
-  bool _running = true;
+  // TODO: Debug
+  // bool _running = true;
+  bool _running = false;
+  bool _initialized = false;
   late final List<TiledObject> blockObjects;
   late final TiledComponent _backgroundScreen;
   late final List<TiledObject> nextBlockObjects;
@@ -26,6 +29,9 @@ class Screen extends World {
   final List<double> borders = [];
   final List<Tetromino> tetrominoList = [];
   DisplayTetromino? nextTetromino;
+
+  bool speedUp = false;
+  bool toRotate = false;
   MoveCommand moveCommand = MoveCommand.none;
 
   @override
@@ -65,18 +71,28 @@ class Screen extends World {
   }
 
   void _initButtons() {
-    final buttonList = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Button")!.objects;
+    final buttonObjList = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Button")!.objects;
 
     List<PositionComponent> buttons = [];
     buttons.add(RedirectionButton(
-        size: buttonList[1].size,
-        position: buttonList[1].position,
+        size: buttonObjList[1].size,
+        position: buttonObjList[1].position,
         moveCommand: MoveCommand.left,
     ));
     buttons.add(RedirectionButton(
-        size: buttonList[3].size,
-        position: buttonList[3].position,
+        size: buttonObjList[3].size,
+        position: buttonObjList[3].position,
         moveCommand: MoveCommand.right,
+    ));
+    buttons.add(StateCtrlButton(
+        size: buttonObjList[0].size,
+        position: buttonObjList[0].position,
+        func: rotateTetro,
+    ));
+    buttons.add(StateCtrlButton(
+        size: buttonObjList[2].size,
+        position: buttonObjList[2].position,
+        func: speedUpTetro,
     ));
 
     addAll(buttons);
@@ -194,6 +210,12 @@ class Screen extends World {
   }
 
   void resetGame() {
+    if (!_initialized) {
+      _running = true;
+      _initialized = true;
+      return;
+    }
+
     _running = false;
 
     for (final tetro in tetrominoList) {
@@ -212,6 +234,14 @@ class Screen extends World {
     moveCommand = MoveCommand.none;
     tetrisEmulator = List.filled(200, 0, growable: true);
     _running = true;
+  }
+
+  void speedUpTetro() {
+    speedUp = true;
+  }
+
+  void rotateTetro() {
+    toRotate = true;
   }
 }
 

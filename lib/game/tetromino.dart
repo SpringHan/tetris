@@ -69,6 +69,8 @@ with HasWorldReference<Screen> {
       deletedFullLines = false;
     }
 
+    // _rotateBlocks();
+    _updateHorizontal();
     _updateFalling(dt);
   }
 
@@ -87,9 +89,15 @@ with HasWorldReference<Screen> {
       return;
     }
 
-    final newBoundaries = _newBoundaries(y: 1);
+    double steps = 1;
+    if (world.speedUp) {
+      world.speedUp = false;
+      steps = 2;
+    }
+
+    final newBoundaries = _newBoundaries(y: steps);
     final newPosition = world.newEmuPosition(
-      y: 1,
+      y: steps,
       tetroType: tetroType,
       positions: positionInEmu,
     );
@@ -100,11 +108,45 @@ with HasWorldReference<Screen> {
     }
 
     for (final b in blocks) {
-      b.moveDown();
+      b.moveDown(times: steps);
     }
     positionInEmu = newPosition;
 
     delayTime = 0.5;
+  }
+
+  void _updateHorizontal() {
+    final move = world.moveCommand;
+    if (move == MoveCommand.none) return;
+
+    final double horizontalMove;
+    if (move == MoveCommand.left) {
+      horizontalMove = -1;
+    } else {
+      horizontalMove = 1;
+    }
+
+    final newBoundaries = _newBoundaries(x: horizontalMove);
+    final newPositions = world.newEmuPosition(
+      x: horizontalMove,
+      tetroType: tetroType,
+      positions: positionInEmu,
+    );
+
+    if (!_canMove(newBoundaries, newPositions)) {
+      _beMoveless();
+      return;
+    }
+
+    for (final b in blocks) {
+      b.moveHorizontal(left: horizontalMove < 0);
+    }
+
+    positionInEmu = newPositions;
+    world.moveCommand = MoveCommand.none;
+  }
+
+  void _rotateBlocks() {
   }
 
   // NOTE: Check all the details then deciding
