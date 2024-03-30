@@ -11,9 +11,7 @@ import './block.dart' show tetrominoMap;
 
 class Screen extends World {
   // Basic variables.
-  // TODO: Debug
-  bool _running = true;
-  // bool _running = false;
+  bool _running = false;
   bool _initialized = false;
   late final List<TiledObject> blockObjects;
   late final TiledComponent _backgroundScreen;
@@ -93,6 +91,17 @@ class Screen extends World {
         size: buttonObjList[2].size,
         position: buttonObjList[2].position,
         func: speedUpTetro,
+    ));
+
+    buttons.add(StateCtrlButton(
+        size: buttonObjList[4].size,
+        position: buttonObjList[4].position,
+        func: changeRunningState,
+    ));
+    buttons.add(StateCtrlButton(
+        size: buttonObjList[5].size,
+        position: buttonObjList[5].position,
+        func: resetGame,
     ));
 
     addAll(buttons);

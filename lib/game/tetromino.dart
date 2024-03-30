@@ -78,7 +78,7 @@ with HasWorldReference<Screen> {
   @override
   void onRemove() {
     for (final i in remainingBlocks) {
-      remove(blocks[i]);
+      blocks[i].removeFromParent();
     }
   }
 
@@ -182,7 +182,7 @@ with HasWorldReference<Screen> {
       if (world.blocksBeRemoved.contains(tempPosition)
         && remainingBlocks.contains(i)) {
         world.blocksBeRemoved.remove(tempPosition);
-        remove(blocks[i]);
+        blocks[i].removeFromParent();
         remainingBlocks.remove(i);
         continue;
       }
