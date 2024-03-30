@@ -69,6 +69,7 @@ with HasWorldReference<Screen> {
       deletedFullLines = false;
     }
 
+    if (state == TetrominoState.moveless) return;
     // _rotateBlocks();
     _updateHorizontal();
     _updateFalling(dt);
@@ -82,22 +83,14 @@ with HasWorldReference<Screen> {
   }
 
   void _updateFalling(double dt) {
-    if (state == TetrominoState.moveless) return;
-
     if (delayTime > 0) {
       delayTime -= dt;
       return;
     }
 
-    double steps = 1;
-    if (world.speedUp) {
-      world.speedUp = false;
-      steps = 2;
-    }
-
-    final newBoundaries = _newBoundaries(y: steps);
+    final newBoundaries = _newBoundaries(y: 1);
     final newPosition = world.newEmuPosition(
-      y: steps,
+      y: 1,
       tetroType: tetroType,
       positions: positionInEmu,
     );
@@ -108,11 +101,12 @@ with HasWorldReference<Screen> {
     }
 
     for (final b in blocks) {
-      b.moveDown(times: steps);
+      b.moveDown();
     }
     positionInEmu = newPosition;
 
-    delayTime = 0.5;
+    delayTime = world.delayLimit;
+    world.restoreSpeed();
   }
 
   void _updateHorizontal() {
@@ -134,7 +128,6 @@ with HasWorldReference<Screen> {
     );
 
     if (!_canMove(newBoundaries, newPositions)) {
-      _beMoveless();
       return;
     }
 
@@ -186,7 +179,8 @@ with HasWorldReference<Screen> {
   void _removeFullLines() {
     for (var i = 0; i < 4; i++) {
       final tempPosition = positionInEmu[i];
-      if (world.blocksBeRemoved.contains(tempPosition)) {
+      if (world.blocksBeRemoved.contains(tempPosition)
+        && remainingBlocks.contains(i)) {
         world.blocksBeRemoved.remove(tempPosition);
         remove(blocks[i]);
         remainingBlocks.remove(i);
@@ -212,6 +206,8 @@ with HasWorldReference<Screen> {
     }
 
     state = TetrominoState.moveless;
+    world.restoreSpeed();
+    world.moveCommand = MoveCommand.none;
     world.tetrominoFinished++;
     world.checkLines();
   }

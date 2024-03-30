@@ -12,8 +12,8 @@ import './block.dart' show tetrominoMap;
 class Screen extends World {
   // Basic variables.
   // TODO: Debug
-  // bool _running = true;
-  bool _running = false;
+  bool _running = true;
+  // bool _running = false;
   bool _initialized = false;
   late final List<TiledObject> blockObjects;
   late final TiledComponent _backgroundScreen;
@@ -30,8 +30,8 @@ class Screen extends World {
   final List<Tetromino> tetrominoList = [];
   DisplayTetromino? nextTetromino;
 
-  bool speedUp = false;
   bool toRotate = false;
+  double delayLimit = 0.5;
   MoveCommand moveCommand = MoveCommand.none;
 
   @override
@@ -228,6 +228,7 @@ class Screen extends World {
     moveLines = null;
     blocksBeRemoved.clear();
 
+    delayLimit = 0.5;
     nextTetromino = null;
     tetrominoFinished = 0;
     tetrominoList.clear();
@@ -237,7 +238,11 @@ class Screen extends World {
   }
 
   void speedUpTetro() {
-    speedUp = true;
+    delayLimit = 0;
+  }
+
+  void restoreSpeed() {
+    if (delayLimit != 0.5) delayLimit = 0.5;
   }
 
   void rotateTetro() {

@@ -35,29 +35,3 @@ with HasWorldReference<Screen>, TapCallbacks {
     func();
   }
 }
-
-// class PauseButton extends PositionComponent
-// with HasWorldReference<Screen>, TapCallbacks {
-//   PauseButton({
-//       required super.size,
-//       required super.position,
-//   });
-
-//   @override
-//   void onTapDown(TapDownEvent event) {
-//     world.changeRunningState();
-//   }
-// }
-
-// class ResetButton extends PositionComponent
-// with HasWorldReference<Screen>, TapCallbacks {
-//   ResetButton({
-//       required super.size,
-//       required super.position,
-//   });
-
-//   @override
-//   void onTapDown(TapDownEvent event) {
-//     world.resetGame();
-//   }
-// }
