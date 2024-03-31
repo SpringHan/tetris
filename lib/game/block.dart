@@ -31,12 +31,43 @@ class BlockSprite extends SpriteComponent {
   }
 }
 
-final tetrominoMap = <String, List<Vector2>> {
-  "I": [Vector2(0, 0), Vector2(0, 1), Vector2(0, 2), Vector2(0, 3)],
-  "O": [Vector2(0, 0), Vector2(0, 1), Vector2(1, 0), Vector2(1, 1)],
-  "J": [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)],
-  "L": [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)],
-  "Z": [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
-  "S": [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 1)],
-  "T": [Vector2(0, 0), Vector2(0, 1), Vector2(-1, 1), Vector2(1, 1)],
+final tetrominoMap = <String, List<List<Vector2>>> {
+  "O": [[Vector2(0, 0), Vector2(0, 1), Vector2(1, 0), Vector2(1, 1)]],
+  "I": [
+    [Vector2(0, 0), Vector2(0, 1), Vector2(0, 2), Vector2(0, 3)],
+    [Vector2(-1, 0), Vector2(0, 0), Vector2(1, 0), Vector2(2, 0)],
+  ],
+  "J": [
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)]
+  ],
+  "L": [
+    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)]
+  ],
+  "Z": [
+    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
+    [Vector2(1, 0), Vector2(1, 1), Vector2(0, 1), Vector2(0, 2)]
+  ],
+  "S": [
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 1)],
+    [Vector2(-1, 0), Vector2(-1, 1), Vector2(0, 1), Vector2(0, 2)]
+  ],
+  "T": [
+    [Vector2(0, 0), Vector2(0, 1), Vector2(-1, 1), Vector2(1, 1)]
+  ],
+};
+
+// TODO: Avoid matching "O"
+final rotateCenter = <String, List<int>> {
+  "I": [1],
+  "J": [0],
+  "L": [0],
+  "Z": [0],
+  "S": [0],
+  "T": [0],
 };

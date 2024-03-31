@@ -185,26 +185,54 @@ class Screen extends World {
       double x = 0,
       double y = 0,
       List<int>? positions,
+      required int tetroStyle,
       required String tetroType,
   }) {
-    final List<int> temp = [];
+    List<int> temp = [];
 
     if (init != null) {
       temp.add(init);
-    } else {
-      temp.add(makeEmuPos(positions![0], x: x, y: y));
+      bool first = true;
+
+      for (final e in tetrominoMap[tetroType]![0]) {
+        if (first) {
+          first = false;
+          continue;
+        }
+
+        temp.add(makeEmuPos(
+            temp[0],
+            x: e.x,
+            y: e.y
+        ));
+      }
+
+      return temp;
     }
 
-    for (final e in tetrominoMap[tetroType]!) {
-      if (e == Vector2(0, 0)) continue;
-      temp.add(makeEmuPos(
-          temp[0],
-          x: e.x,
-          y: e.y
-      ));
+    temp = List.from(positions!);
+    for (var i = 0; i < 4; i++) {
+      temp[i] = makeEmuPos(temp[i], x: x, y: y);
     }
 
     return temp;
+
+    // if (init != null) {
+    //   temp.add(init);
+    // } else {
+    //   temp.add(makeEmuPos(positions![0], x: x, y: y));
+    // }
+
+    // for (final e in tetrominoMap[tetroType]![tetroStyle]) {
+    //   if (e == Vector2(0, 0)) continue;
+    //   temp.add(makeEmuPos(
+    //       temp[0],
+    //       x: e.x,
+    //       y: e.y
+    //   ));
+    // }
+
+    // return temp;
   }
 
   // Pause the game or not.

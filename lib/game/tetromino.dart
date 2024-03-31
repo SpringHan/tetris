@@ -28,6 +28,7 @@ with HasWorldReference<Screen> {
   final String tetroType;
   final List<int> remainingBlocks = [0, 1, 2, 3];
 
+  int tetroStyle = 0;
   bool moveLock = false;
   bool deletedFullLines = false;
   double delayTime = 0.5;
@@ -37,7 +38,7 @@ with HasWorldReference<Screen> {
 
   @override
   FutureOr<void> onLoad() async {
-    final positions = tetrominoMap[tetroType]!;
+    final positions = tetrominoMap[tetroType]![tetroStyle];
     final targetObject = world.blockObjects[4];
     final targetPosition = Vector2(targetObject.x, targetObject.y);
 
@@ -47,7 +48,8 @@ with HasWorldReference<Screen> {
 
     positionInEmu = world.newEmuPosition(
       init: 4,
-      tetroType: tetroType
+      tetroType: tetroType,
+      tetroStyle: tetroStyle
     );
 
     if (!_canMove([], positionInEmu)) {
@@ -92,6 +94,7 @@ with HasWorldReference<Screen> {
     final newPosition = world.newEmuPosition(
       y: 1,
       tetroType: tetroType,
+      tetroStyle: tetroStyle,
       positions: positionInEmu,
     );
 
@@ -124,6 +127,7 @@ with HasWorldReference<Screen> {
     final newPositions = world.newEmuPosition(
       x: horizontalMove,
       tetroType: tetroType,
+      tetroStyle: tetroStyle,
       positions: positionInEmu,
     );
 

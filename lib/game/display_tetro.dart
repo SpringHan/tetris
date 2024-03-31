@@ -24,10 +24,11 @@ with HasWorldReference<Screen> {
       world.nextBlockObjects[1].x,
       world.nextBlockObjects[1].y
     );
-    final relativePositions = tetrominoMap[tetroType]!;
+    final relativePositions = tetrominoMap[tetroType]![0];
 
     positionInEmu = world.newEmuPosition(
       init: 1,
+      tetroStyle: 0,
       tetroType: tetroType
     );
 
