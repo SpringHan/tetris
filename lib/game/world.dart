@@ -215,23 +215,6 @@ class Screen extends World {
     }
 
     return temp;
-
-    // if (init != null) {
-    //   temp.add(init);
-    // } else {
-    //   temp.add(makeEmuPos(positions![0], x: x, y: y));
-    // }
-
-    // for (final e in tetrominoMap[tetroType]![tetroStyle]) {
-    //   if (e == Vector2(0, 0)) continue;
-    //   temp.add(makeEmuPos(
-    //       temp[0],
-    //       x: e.x,
-    //       y: e.y
-    //   ));
-    // }
-
-    // return temp;
   }
 
   // Pause the game or not.
@@ -296,15 +279,27 @@ String _getNewBlock() {
 
 // NOTE: When the movement is illegal, returning null.
 int? makeEmuPos(int idx, {double x = 0, double y = 0}) {
-  // idx += x.toInt() + 10 * y.toInt();
-  if ((idx + 1) % 10 == 0 && x > 0
-    || idx % 10 == 0 && x < 0) return null;
+  var lineBeforeHorizontal = _calcLineNum(idx);
+  idx += x.toInt();
 
-  idx += x.toInt() + 10 * y.toInt();
+  if (lineBeforeHorizontal != _calcLineNum(idx)) return null;
+
+  idx += 10 * y.toInt();
 
   if (idx < 0 || idx > 199) return null;
 
   return idx;
+}
+
+int _calcLineNum(int idx) {
+  var lineNum = (idx + 1) / 10;
+  final lineLength = lineNum.toInt();
+
+  if (lineNum - lineLength == 0) {
+    lineNum--;
+  }
+
+  return lineNum.toInt();
 }
 
 final blockTypes = <int, String> {

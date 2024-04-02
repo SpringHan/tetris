@@ -95,7 +95,7 @@ with HasWorldReference<Screen> {
       positions: positionInEmu
     );
 
-    // TODO: Debug
+    // TODO: Debug for the first parameter of `canMove`.
     if (!_canMove([], newPosition)) {
       _beMoveless();
       return;
@@ -129,6 +129,7 @@ with HasWorldReference<Screen> {
     );
 
     if (!_canMove([], newPositions)) {
+      world.moveCommand = MoveCommand.none;
       return;
     }
 
@@ -148,7 +149,10 @@ with HasWorldReference<Screen> {
     final List<Vector2> relativePos;
     final tetroStyles = tetrominoMap[tetroType]!;
 
-    if (tetroStyles.length == 1) return;
+    if (tetroStyles.length == 1) {
+      world.toRotate = false;
+      return;
+    }
 
     if (tetroStyles.length == newStyleIdx + 1) {
       newStyleIdx = 0;
@@ -168,19 +172,24 @@ with HasWorldReference<Screen> {
       );
 
       // NOTE: Bug may occur.
-      if (temp == null) return;
+      if (temp == null) {
+        world.toRotate = false;
+        return;
+      }
       centerPos = temp;
     }
 
     final newPositions = world.newEmuPosition(
       init: centerPos,
-      style: tetroStyle,
+      style: newStyleIdx,
       tetroType: tetroType
     );
 
-    if (!_canMove([], newPositions)) return;
+    if (!_canMove([], newPositions)) {
+      world.toRotate = false;
+      return;
+    }
 
-    positionInEmu = newPositions!;
     final targetObject = world.blockObjects[centerPos];
     final targetPosition = Vector2(targetObject.x, targetObject.y);
 
@@ -188,6 +197,8 @@ with HasWorldReference<Screen> {
       blocks[i].position = targetPosition + relativePos[i] * 64;
     }
 
+    positionInEmu = newPositions!;
+    tetroStyle = newStyleIdx;
     world.toRotate = false;
   }
 
@@ -209,22 +220,6 @@ with HasWorldReference<Screen> {
 
     return true;
   }
-
-  // NOTE: Call this function after calling rotate.
-  // List<double> _newBoundaries({double x = 0, double y = 0}) {
-  //   final List<double> xList = [];
-  //   final List<double> yList = [];
-  //   for (final block in blocks) {
-  //     xList.add(block.x + x * 64);
-  //     yList.add(block.y + y * 64);
-  //   }
-
-  //   return [
-  //     yList.reduce(max),
-  //     xList.reduce(min),
-  //     xList.reduce(max)
-  //   ];
-  // }
 
   // Remove the blocks included in full lines. Then move remaining blocks down.
   void _removeFullLines() {

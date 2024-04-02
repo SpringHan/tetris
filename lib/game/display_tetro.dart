@@ -28,9 +28,8 @@ with HasWorldReference<Screen> {
 
     positionInEmu = world.newEmuPosition(
       init: 1,
-      tetroStyle: 0,
       tetroType: tetroType
-    );
+    )!;
 
     for (final p in relativePositions) {
       blocks.add(BlockSprite(
