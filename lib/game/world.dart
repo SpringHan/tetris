@@ -302,7 +302,7 @@ int? makeEmuPos(int idx, {double x = 0, double y = 0}) {
 
   idx += x.toInt() + 10 * y.toInt();
 
-  if (idx > 199) return null;
+  if (idx < 0 || idx > 199) return null;
 
   return idx;
 }

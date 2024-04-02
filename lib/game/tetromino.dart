@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flame/components.dart';
 
@@ -71,7 +70,7 @@ with HasWorldReference<Screen> {
     }
 
     if (state == TetrominoState.moveless) return;
-    // _rotateBlocks();
+    _rotateBlocks();
     _updateHorizontal();
     _updateFalling(dt);
   }
@@ -145,7 +144,7 @@ with HasWorldReference<Screen> {
     if (!world.toRotate) return;
 
     int newStyleIdx = tetroStyle;
-    final int center;
+    final (int, Vector2?) center;
     final List<Vector2> relativePos;
     final tetroStyles = tetrominoMap[tetroType]!;
 
@@ -160,7 +159,19 @@ with HasWorldReference<Screen> {
     relativePos = tetroStyles[newStyleIdx];
     center = rotateCenter[tetroType]![newStyleIdx];
 
-    final centerPos = positionInEmu[center];
+    var centerPos = positionInEmu[center.$1];
+    if (center.$2 != null) {
+      var temp = makeEmuPos(
+        centerPos,
+        x: center.$2!.x,
+        y: center.$2!.y
+      );
+
+      // NOTE: Bug may occur.
+      if (temp == null) return;
+      centerPos = temp;
+    }
+
     final newPositions = world.newEmuPosition(
       init: centerPos,
       style: tetroStyle,
@@ -247,6 +258,7 @@ with HasWorldReference<Screen> {
 
     state = TetrominoState.moveless;
     world.restoreSpeed();
+    world.toRotate = false;
     world.moveCommand = MoveCommand.none;
     world.tetrominoFinished++;
     world.checkLines();
