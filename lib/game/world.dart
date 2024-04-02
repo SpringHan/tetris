@@ -180,31 +180,28 @@ class Screen extends World {
   }
 
   // NOTE: When `init` is null, `positions` must be non-null.
-  List<int> newEmuPosition({
+  // When the movement is illegal, returning null.
+  List<int>? newEmuPosition({
       int? init,
+      int style = 0,
       double x = 0,
       double y = 0,
       List<int>? positions,
-      required int tetroStyle,
       required String tetroType,
   }) {
     List<int> temp = [];
 
     if (init != null) {
-      temp.add(init);
-      bool first = true;
+      for (final e in tetrominoMap[tetroType]![style]) {
+        final newPosition = makeEmuPos(
+          init,
+          x: e.x,
+          y: e.y
+        );
 
-      for (final e in tetrominoMap[tetroType]![0]) {
-        if (first) {
-          first = false;
-          continue;
-        }
+        if (newPosition == null) return null;
 
-        temp.add(makeEmuPos(
-            temp[0],
-            x: e.x,
-            y: e.y
-        ));
+        temp.add(newPosition);
       }
 
       return temp;
@@ -212,7 +209,9 @@ class Screen extends World {
 
     temp = List.from(positions!);
     for (var i = 0; i < 4; i++) {
-      temp[i] = makeEmuPos(temp[i], x: x, y: y);
+      final newPosition = makeEmuPos(temp[i], x: x, y: y);
+      if (newPosition == null) return null;
+      temp[i] = newPosition;
     }
 
     return temp;
@@ -295,10 +294,16 @@ String _getNewBlock() {
   return blockTypes[Random().nextInt(7)]!;
 }
 
-// NOTE: As the check of the occupation of blocks is executed
-// after boundary check, there's no need to care about overflow here.
-int makeEmuPos(int idx, {double x = 0, double y = 0}) {
+// NOTE: When the movement is illegal, returning null.
+int? makeEmuPos(int idx, {double x = 0, double y = 0}) {
+  // idx += x.toInt() + 10 * y.toInt();
+  if ((idx + 1) % 10 == 0 && x > 0
+    || idx % 10 == 0 && x < 0) return null;
+
   idx += x.toInt() + 10 * y.toInt();
+
+  if (idx > 199) return null;
+
   return idx;
 }
 

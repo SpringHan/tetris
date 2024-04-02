@@ -48,9 +48,8 @@ with HasWorldReference<Screen> {
 
     positionInEmu = world.newEmuPosition(
       init: 4,
-      tetroType: tetroType,
-      tetroStyle: tetroStyle
-    );
+      tetroType: tetroType
+    )!;
 
     if (!_canMove([], positionInEmu)) {
       remainingBlocks.clear();
@@ -90,15 +89,15 @@ with HasWorldReference<Screen> {
       return;
     }
 
-    final newBoundaries = _newBoundaries(y: 1);
+    // final newBoundaries = _newBoundaries(y: 1);
     final newPosition = world.newEmuPosition(
       y: 1,
       tetroType: tetroType,
-      tetroStyle: tetroStyle,
-      positions: positionInEmu,
+      positions: positionInEmu
     );
 
-    if (!_canMove(newBoundaries, newPosition)) {
+    // TODO: Debug
+    if (!_canMove([], newPosition)) {
       _beMoveless();
       return;
     }
@@ -106,7 +105,7 @@ with HasWorldReference<Screen> {
     for (final b in blocks) {
       b.moveDown();
     }
-    positionInEmu = newPosition;
+    positionInEmu = newPosition!;
 
     delayTime = world.delayLimit;
     world.restoreSpeed();
@@ -123,15 +122,14 @@ with HasWorldReference<Screen> {
       horizontalMove = 1;
     }
 
-    final newBoundaries = _newBoundaries(x: horizontalMove);
+    // final newBoundaries = _newBoundaries(x: horizontalMove);
     final newPositions = world.newEmuPosition(
       x: horizontalMove,
       tetroType: tetroType,
-      tetroStyle: tetroStyle,
-      positions: positionInEmu,
+      positions: positionInEmu
     );
 
-    if (!_canMove(newBoundaries, newPositions)) {
+    if (!_canMove([], newPositions)) {
       return;
     }
 
@@ -139,16 +137,55 @@ with HasWorldReference<Screen> {
       b.moveHorizontal(left: horizontalMove < 0);
     }
 
-    positionInEmu = newPositions;
+    positionInEmu = newPositions!;
     world.moveCommand = MoveCommand.none;
   }
 
   void _rotateBlocks() {
+    if (!world.toRotate) return;
+
+    int newStyleIdx = tetroStyle;
+    final int center;
+    final List<Vector2> relativePos;
+    final tetroStyles = tetrominoMap[tetroType]!;
+
+    if (tetroStyles.length == 1) return;
+
+    if (tetroStyles.length == newStyleIdx + 1) {
+      newStyleIdx = 0;
+    } else {
+      newStyleIdx++;
+    }
+
+    relativePos = tetroStyles[newStyleIdx];
+    center = rotateCenter[tetroType]![newStyleIdx];
+
+    final centerPos = positionInEmu[center];
+    final newPositions = world.newEmuPosition(
+      init: centerPos,
+      style: tetroStyle,
+      tetroType: tetroType
+    );
+
+    if (!_canMove([], newPositions)) return;
+
+    positionInEmu = newPositions!;
+    final targetObject = world.blockObjects[centerPos];
+    final targetPosition = Vector2(targetObject.x, targetObject.y);
+
+    for (var i = 0; i < 4; i++) {
+      // TODO: Here
+      // blocks[i].position = targetPosition + 64 * ;
+    }
+
+    world.toRotate = false;
   }
 
   // NOTE: Check all the details then deciding
   // whether current movement can be executed.
-  bool _canMove(List<double> boundaries, List<int> position) {
+  bool _canMove(List<double> boundaries, List<int>? position) {
+    if (position == null) return false;
+
     // When initialize tetromino, boundaries can be empty.
     if (boundaries.isNotEmpty) {
       if (boundaries[0] > world.borders[1]
@@ -164,20 +201,20 @@ with HasWorldReference<Screen> {
   }
 
   // NOTE: Call this function after calling rotate.
-  List<double> _newBoundaries({double x = 0, double y = 0}) {
-    final List<double> xList = [];
-    final List<double> yList = [];
-    for (final block in blocks) {
-      xList.add(block.x + x * 64);
-      yList.add(block.y + y * 64);
-    }
+  // List<double> _newBoundaries({double x = 0, double y = 0}) {
+  //   final List<double> xList = [];
+  //   final List<double> yList = [];
+  //   for (final block in blocks) {
+  //     xList.add(block.x + x * 64);
+  //     yList.add(block.y + y * 64);
+  //   }
 
-    return [
-      yList.reduce(max),
-      xList.reduce(min),
-      xList.reduce(max)
-    ];
-  }
+  //   return [
+  //     yList.reduce(max),
+  //     xList.reduce(min),
+  //     xList.reduce(max)
+  //   ];
+  // }
 
   // Remove the blocks included in full lines. Then move remaining blocks down.
   void _removeFullLines() {
