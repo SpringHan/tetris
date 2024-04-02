@@ -39,15 +39,15 @@ final tetrominoMap = <String, List<List<Vector2>>> {
   ],
   "J": [
     [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(0, 2)]
+    [Vector2(1, 0), Vector2(1, -1), Vector2(0, -1), Vector2(-1, -1)],
+    [Vector2(0, 1), Vector2(1, 1), Vector2(1, 0), Vector2(1, -1)],
+    [Vector2(-1, 0), Vector2(-1, 1), Vector2(0, 1), Vector2(1, 1)]
   ],
   "L": [
     [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)]
+    [Vector2(1, 0), Vector2(1, 1), Vector2(0, 1), Vector2(-1, 1)],
+    [Vector2(0, 1), Vector2(-1, 1), Vector2(-1, 0), Vector2(-1, -1)],
+    [Vector2(-1, 0), Vector2(-1, -1), Vector2(0, -1), Vector2(1, -1)]
   ],
   "Z": [
     [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
@@ -58,16 +58,47 @@ final tetrominoMap = <String, List<List<Vector2>>> {
     [Vector2(-1, 0), Vector2(-1, 1), Vector2(0, 1), Vector2(0, 2)]
   ],
   "T": [
-    [Vector2(0, 0), Vector2(0, 1), Vector2(-1, 1), Vector2(1, 1)]
+    [Vector2(0, 0), Vector2(0, 1), Vector2(-1, 1), Vector2(1, 1)],
+    [Vector2(0, -1), Vector2(0, 0), Vector2(1, 0), Vector2(0, 1)],
+    [Vector2(-1, 0), Vector2(0, 0), Vector2(1, 0), Vector2(0, 1)],
+    [Vector2(0, -1), Vector2(0, 0), Vector2(-1, 0), Vector2(0, 1)]
   ],
 };
 
-// TODO: Avoid matching "O"
-final rotateCenter = <String, List<int>> {
-  "I": [1],
-  "J": [0],
-  "L": [0],
-  "Z": [0],
-  "S": [0],
-  "T": [0],
+// The key position for navigating positions of the rotated blocks.
+// With the format: [(
+// Index of the specific position in `positionInEmu`,
+// the offset to the final position
+// )]
+final rotateCenter = <String, List<(int, Vector2?)>> {
+  "I": [
+    (1, Vector2(0, -1)),
+    (1, null)
+  ],
+  "J": [
+    (0, Vector2(0, -1)),
+    (1, Vector2(0, 1)),
+    (0, Vector2(-1, 0)),
+    (0, Vector2(0, -1))
+  ],
+  "L": [
+    (2, null),
+    (0, Vector2(0, 1)),
+    (0, Vector2(-1, 0)),
+    (0, Vector2(0, -1))
+  ],
+  "Z": [
+    (0, Vector2(-1, 0)),
+    (0, null)
+  ],
+  "S": [
+    (0, Vector2(1, 0)),
+    (0, null)
+  ],
+  "T": [
+    (0, null),
+    (1, null),
+    (1, null),
+    (1, null)
+  ],
 };
