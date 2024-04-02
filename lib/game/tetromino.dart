@@ -174,8 +174,7 @@ with HasWorldReference<Screen> {
     final targetPosition = Vector2(targetObject.x, targetObject.y);
 
     for (var i = 0; i < 4; i++) {
-      // TODO: Here
-      // blocks[i].position = targetPosition + 64 * ;
+      blocks[i].position = targetPosition + relativePos[i] * 64;
     }
 
     world.toRotate = false;
