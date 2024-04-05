@@ -16,7 +16,12 @@ with HasWorldReference<Screen>, TapCallbacks {
 
   @override
   void onTapDown(TapDownEvent event) {
-    world.moveCommand = moveCommand;
+    double move = 1;
+    if (moveCommand == MoveCommand.left) {
+      move = -1;
+    }
+
+    world.tetrominoList.first.updateHorizontal(move);
   }
 }
 

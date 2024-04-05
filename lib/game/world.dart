@@ -30,7 +30,6 @@ class Screen extends World {
 
   bool toRotate = false;
   double delayLimit = 0.5;
-  MoveCommand moveCommand = MoveCommand.none;
 
   @override
   FutureOr<void> onLoad() async {
@@ -51,8 +50,8 @@ class Screen extends World {
 
     if (tetrominoFinished == tetrominoList.length) {
       if (nextTetromino != null) {
-        tetrominoList.add(Tetromino(nextTetromino!));
-        add(tetrominoList.last);
+        tetrominoList.insert(0, Tetromino(nextTetromino!));
+        add(tetrominoList.first);
         remove(nextTetromino!);
       }
       _newTetromino();
@@ -221,10 +220,10 @@ class Screen extends World {
   void changeRunningState() {
     if (_running) {
       _running = false;
-      tetrominoList.last.moveLock = true;
+      tetrominoList.first.moveLock = true;
     } else {
       _running = true;
-      tetrominoList.last.moveLock = false;
+      tetrominoList.first.moveLock = false;
     }
   }
 
@@ -251,7 +250,6 @@ class Screen extends World {
     nextTetromino = null;
     tetrominoFinished = 0;
     tetrominoList.clear();
-    moveCommand = MoveCommand.none;
     tetrisEmulator = List.filled(200, 0, growable: true);
     _running = true;
   }

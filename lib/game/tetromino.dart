@@ -13,8 +13,7 @@ enum TetrominoState {
 
 enum MoveCommand {
   left,
-  right,
-  none
+  right
 }
 
 class Tetromino extends Component
@@ -70,8 +69,6 @@ with HasWorldReference<Screen> {
     }
 
     if (state == TetrominoState.moveless) return;
-    _rotateBlocks();
-    _updateHorizontal();
     _updateFalling(dt);
   }
 
@@ -88,14 +85,12 @@ with HasWorldReference<Screen> {
       return;
     }
 
-    // final newBoundaries = _newBoundaries(y: 1);
     final newPosition = world.newEmuPosition(
       y: 1,
       tetroType: tetroType,
       positions: positionInEmu
     );
 
-    // TODO: Debug for the first parameter of `canMove`.
     if (!_canMove([], newPosition)) {
       _beMoveless();
       return;
@@ -106,22 +101,14 @@ with HasWorldReference<Screen> {
     }
     positionInEmu = newPosition!;
 
+    // TODO: Improve the way to speed up.
     delayTime = world.delayLimit;
     world.restoreSpeed();
   }
 
-  void _updateHorizontal() {
-    final move = world.moveCommand;
-    if (move == MoveCommand.none) return;
+  void updateHorizontal(double horizontalMove) {
+    moveLock = true;
 
-    final double horizontalMove;
-    if (move == MoveCommand.left) {
-      horizontalMove = -1;
-    } else {
-      horizontalMove = 1;
-    }
-
-    // final newBoundaries = _newBoundaries(x: horizontalMove);
     final newPositions = world.newEmuPosition(
       x: horizontalMove,
       tetroType: tetroType,
@@ -129,7 +116,7 @@ with HasWorldReference<Screen> {
     );
 
     if (!_canMove([], newPositions)) {
-      world.moveCommand = MoveCommand.none;
+      moveLock = false;
       return;
     }
 
@@ -138,7 +125,7 @@ with HasWorldReference<Screen> {
     }
 
     positionInEmu = newPositions!;
-    world.moveCommand = MoveCommand.none;
+    moveLock = false;
   }
 
   void _rotateBlocks() {
