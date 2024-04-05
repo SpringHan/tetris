@@ -21,9 +21,6 @@ class Screen extends World {
   (int, int)? moveLines; // Lines to move down. Used after clearing full lines.
   List<int> blocksBeRemoved = []; // The idx of blocks to be removed.
 
-  // The number of tetromino which finished current dropping.
-  int tetrominoFinished = 0;
-
   final List<double> borders = [];
   final List<Tetromino> tetrominoList = [];
   DisplayTetromino? nextTetromino;
@@ -47,7 +44,12 @@ class Screen extends World {
   void update(double dt) {
     if (!_running) return;
 
-    if (tetrominoFinished == tetrominoList.length) {
+    if (blocksBeRemoved.isNotEmpty) {
+      return;
+    }
+
+    if (tetrominoList.isEmpty
+      || tetrominoList.first.state == TetrominoState.moveless) {
       if (nextTetromino != null) {
         tetrominoList.insert(0, Tetromino(nextTetromino!));
         add(tetrominoList.first);
@@ -247,7 +249,6 @@ class Screen extends World {
 
     delayLimit = 0.5;
     nextTetromino = null;
-    tetrominoFinished = 0;
     tetrominoList.clear();
     tetrisEmulator = List.filled(200, 0, growable: true);
     _running = true;

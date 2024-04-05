@@ -240,7 +240,6 @@ with HasWorldReference<Screen> {
 
     state = TetrominoState.moveless;
     world.restoreSpeed();
-    world.tetrominoFinished++;
     world.checkLines();
   }
 }
