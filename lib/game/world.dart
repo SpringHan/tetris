@@ -28,7 +28,6 @@ class Screen extends World {
   final List<Tetromino> tetrominoList = [];
   DisplayTetromino? nextTetromino;
 
-  bool toRotate = false;
   double delayLimit = 0.5;
 
   @override
@@ -263,7 +262,13 @@ class Screen extends World {
   }
 
   void rotateTetro() {
-    toRotate = true;
+    if (!_running) return;
+
+    final movingTetro = tetrominoList.first;
+    if (movingTetro.moveLock
+      || movingTetro.state == TetrominoState.moveless) return;
+
+    movingTetro.rotateBlocks();
   }
 }
 

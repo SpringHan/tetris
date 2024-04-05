@@ -128,8 +128,8 @@ with HasWorldReference<Screen> {
     moveLock = false;
   }
 
-  void _rotateBlocks() {
-    if (!world.toRotate) return;
+  void rotateBlocks() {
+    moveLock = true;
 
     int newStyleIdx = tetroStyle;
     final (int, Vector2?) center;
@@ -137,7 +137,7 @@ with HasWorldReference<Screen> {
     final tetroStyles = tetrominoMap[tetroType]!;
 
     if (tetroStyles.length == 1) {
-      world.toRotate = false;
+      moveLock = false;
       return;
     }
 
@@ -160,7 +160,7 @@ with HasWorldReference<Screen> {
 
       // NOTE: Bug may occur.
       if (temp == null) {
-        world.toRotate = false;
+        moveLock = false;
         return;
       }
       centerPos = temp;
@@ -173,7 +173,7 @@ with HasWorldReference<Screen> {
     );
 
     if (!_canMove([], newPositions)) {
-      world.toRotate = false;
+      moveLock = false;
       return;
     }
 
@@ -186,7 +186,7 @@ with HasWorldReference<Screen> {
 
     positionInEmu = newPositions!;
     tetroStyle = newStyleIdx;
-    world.toRotate = false;
+    moveLock = false;
   }
 
   // NOTE: Check all the details then deciding
@@ -240,8 +240,6 @@ with HasWorldReference<Screen> {
 
     state = TetrominoState.moveless;
     world.restoreSpeed();
-    world.toRotate = false;
-    world.moveCommand = MoveCommand.none;
     world.tetrominoFinished++;
     world.checkLines();
   }
