@@ -69,7 +69,7 @@ with HasWorldReference<Screen> {
     }
 
     if (state == TetrominoState.moveless) return;
-    _updateFalling(dt);
+    updateFalling(dt);
   }
 
   @override
@@ -79,7 +79,7 @@ with HasWorldReference<Screen> {
     }
   }
 
-  void _updateFalling(double dt) {
+  void updateFalling(double dt) {
     if (delayTime > 0) {
       delayTime -= dt;
       return;
@@ -101,9 +101,7 @@ with HasWorldReference<Screen> {
     }
     positionInEmu = newPosition!;
 
-    // TODO: Improve the way to speed up.
-    delayTime = world.delayLimit;
-    world.restoreSpeed();
+    delayTime = 0.5;
   }
 
   void updateHorizontal(double horizontalMove) {
@@ -239,7 +237,6 @@ with HasWorldReference<Screen> {
     }
 
     state = TetrominoState.moveless;
-    world.restoreSpeed();
     world.checkLines();
   }
 }

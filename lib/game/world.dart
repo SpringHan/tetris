@@ -255,11 +255,18 @@ class Screen extends World {
   }
 
   void speedUpTetro() {
-    delayLimit = 0;
-  }
+    if (!_running) return;
 
-  void restoreSpeed() {
-    if (delayLimit != 0.5) delayLimit = 0.5;
+    final movingTetro = tetrominoList.first;
+    if (movingTetro.moveLock == true
+      || movingTetro.state == TetrominoState.moveless) return;
+
+    // Let the blocks move down twice continuously.
+    movingTetro.moveLock = true;
+    movingTetro.delayTime = 0;
+    movingTetro.updateFalling(0);
+    movingTetro.delayTime = 0;
+    movingTetro.moveLock = false;
   }
 
   void rotateTetro() {
