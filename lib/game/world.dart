@@ -25,8 +25,6 @@ class Screen extends World {
   final List<Tetromino> tetrominoList = [];
   DisplayTetromino? nextTetromino;
 
-  double delayLimit = 0.5;
-
   @override
   FutureOr<void> onLoad() async {
     _backgroundScreen = await TiledComponent.load("Main.tmx", Vector2.all(16));
@@ -247,7 +245,6 @@ class Screen extends World {
     moveLines = null;
     blocksBeRemoved.clear();
 
-    delayLimit = 0.5;
     nextTetromino = null;
     tetrominoList.clear();
     tetrisEmulator = List.filled(200, 0, growable: true);
