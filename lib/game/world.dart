@@ -18,7 +18,8 @@ class Screen extends World {
   late final List<TiledObject> nextBlockObjects;
   List<int> tetrisEmulator = List.filled(200, 0, growable: true);
 
-  (int, int)? moveLines; // Lines to move down. Used after clearing full lines.
+  // The lines that have been removed. Stored using the index of last item.
+  List<int> removedLines = []; 
   List<int> blocksBeRemoved = []; // The idx of blocks to be removed.
 
   final List<double> borders = [];
@@ -122,7 +123,7 @@ class Screen extends World {
     // added to newEmulator for the check of item numbers.
     int? emptyLineNum;
 
-    int? splitItem;
+    List<int> fullLines = [];
     List<int> newEmulator = [];
 
     blocksBeRemoved.clear();
@@ -143,7 +144,7 @@ class Screen extends World {
       }
 
       if (!hasEmptyBlock) {
-        splitItem ??= i - 10;
+        fullLines.add(i - 10);
         blocksBeRemoved.addAll(List.generate(10, (index) => i - index));
         continue;
       }
@@ -161,14 +162,16 @@ class Screen extends World {
     : newEmulator.length;
 
     // Avoid extra cost.
-    if (remainingItems == 200) return;
-
-    moveLines = (splitItem!, 20 - remainingItems ~/ 10);
+    if (remainingItems == 200) {
+      if (blocksBeRemoved.isNotEmpty) blocksBeRemoved.clear();
+      return;
+    }
 
     final List<int> emptyBlocks = List.filled(
       200 - newEmulator.length,
       0
     );
+    removedLines = fullLines;
     tetrisEmulator = [...emptyBlocks, ...newEmulator];
   }
 
@@ -242,7 +245,7 @@ class Screen extends World {
     if (nextTetromino != null
       && !nextTetromino!.isRemoved) remove(nextTetromino!);
 
-    moveLines = null;
+    removedLines.clear();
     blocksBeRemoved.clear();
 
     nextTetromino = null;

@@ -218,9 +218,10 @@ with HasWorldReference<Screen> {
         continue;
       }
 
-      if (tempPosition <= world.moveLines!.$1) {
-        blocks[i].moveDown(times: world.moveLines!.$2.toDouble());
-        positionInEmu[i] += world.moveLines!.$2 * 10;
+      final downLines = _linesToMove(tempPosition);
+      if (downLines > 0) {
+        blocks[i].moveDown(times: downLines.toDouble());
+        positionInEmu[i] += downLines * 10;
       }
     }
 
@@ -238,5 +239,15 @@ with HasWorldReference<Screen> {
 
     state = TetrominoState.moveless;
     world.checkLines();
+  }
+
+  int _linesToMove(int position) {
+    int line = 0;
+
+    for (final i in world.removedLines) {
+      if (position <= i) line++;
+    }
+
+    return line;
   }
 }
