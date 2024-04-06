@@ -23,9 +23,4 @@ class TetrisGame extends FlameGame {
 
     addAll([cam, backgroundScreen]);
   }
-
-  // @override
-  // Color backgroundColor() {
-  //   return const Color(0xFFFFFFFF);
-  // }
 }

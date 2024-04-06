@@ -8,6 +8,7 @@ import './tetromino.dart';
 import './button.dart';
 import './display_tetro.dart';
 import './block.dart' show tetrominoMap;
+import './score.dart';
 
 class Screen extends World {
   // Basic variables.
@@ -22,6 +23,7 @@ class Screen extends World {
   List<int> removedLines = []; 
   List<int> blocksBeRemoved = []; // The idx of blocks to be removed.
 
+  late Score scoreComponent;
   final List<double> borders = [];
   final List<Tetromino> tetrominoList = [];
   DisplayTetromino? nextTetromino;
@@ -33,6 +35,7 @@ class Screen extends World {
     blockObjects = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Block")!.objects;
     nextBlockObjects = _backgroundScreen.tileMap.getLayer<ObjectGroup>("NextBlock")!.objects;
 
+    _initScore();
     _initBorders();
     _initButtons();
 
@@ -104,6 +107,16 @@ class Screen extends World {
     ));
 
     addAll(buttons);
+  }
+
+  void _initScore() {
+    final textObject = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Score")!.objects.first;
+    scoreComponent = Score(
+      size: textObject.size,
+      position: textObject.position,
+    );
+
+    add(scoreComponent);
   }
 
   void _newTetromino() {
