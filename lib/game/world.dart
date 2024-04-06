@@ -132,6 +132,8 @@ class Screen extends World {
 
   // When there're lines filled with blocks, clear these lines and make other blocks down.
   void checkLines() {
+    _running = false;
+
     // Used to avoid the disturbance of empty lines that were not
     // added to newEmulator for the check of item numbers.
     int? emptyLineNum;
@@ -177,6 +179,7 @@ class Screen extends World {
     // Avoid extra cost.
     if (remainingItems == 200) {
       if (blocksBeRemoved.isNotEmpty) blocksBeRemoved.clear();
+      _running = true;
       return;
     }
 
@@ -184,8 +187,12 @@ class Screen extends World {
       200 - newEmulator.length,
       0
     );
+
     removedLines = fullLines;
     tetrisEmulator = [...emptyBlocks, ...newEmulator];
+    scoreComponent.increase(fullLines.length);
+
+    _running = true;
   }
 
   void removeEmptyTetro(Tetromino object) {
@@ -254,6 +261,7 @@ class Screen extends World {
     for (final tetro in tetrominoList) {
       if (!tetro.isRemoved) remove(tetro);
     }
+    scoreComponent.reset();
 
     if (nextTetromino != null
       && !nextTetromino!.isRemoved) remove(nextTetromino!);

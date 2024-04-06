@@ -101,7 +101,7 @@ with HasWorldReference<Screen> {
     }
     positionInEmu = newPosition!;
 
-    delayTime = 0.5;
+    delayTime = world.scoreComponent.limitTime;
   }
 
   void updateHorizontal(double horizontalMove) {

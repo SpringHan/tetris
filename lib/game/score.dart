@@ -14,10 +14,11 @@ class Score extends PositionComponent {
 
   int prev = 0;
   int score = 0;
+  double limitTime = 0.5;
 
   @override
   FutureOr<void> onLoad() async {
-    final component = AlignComponent(
+    component = AlignComponent(
       alignment: Anchor.centerRight,
       child: TextComponent(
         textRenderer: TextPaint(
@@ -38,7 +39,6 @@ class Score extends PositionComponent {
       prev = score;
       final child = component.child as TextComponent;
       child.text = score.toString();
-      // component.update(dt);
     }
   }
 
@@ -47,11 +47,16 @@ class Score extends PositionComponent {
     remove(component);
   }
 
-  void increase() {
-    score++;
+  void increase(int scores) {
+    score += scores;
+
+    if (limitTime == 0) return;
+    limitTime = 0.5 - (score ~/ 5) * 0.03;
+    if (limitTime < 0) limitTime = 0;
   }
 
   void reset() {
     score = 0;
+    limitTime = 0.5;
   }
 }
