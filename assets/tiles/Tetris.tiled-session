@@ -14,10 +14,10 @@
                 3
             ],
             "scale": 0.25,
-            "selectedLayer": 0,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 264,
-                "y": 1092
+                "x": 248,
+                "y": 892
             }
         },
         "Test.tmx": {
