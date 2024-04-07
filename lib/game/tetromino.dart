@@ -49,7 +49,7 @@ with HasWorldReference<Screen> {
       tetroType: tetroType
     )!;
 
-    if (!_canMove([], positionInEmu)) {
+    if (!_canMove(positionInEmu)) {
       remainingBlocks.clear();
       world.changeRunningState();
     }
@@ -91,7 +91,7 @@ with HasWorldReference<Screen> {
       positions: positionInEmu
     );
 
-    if (!_canMove([], newPosition)) {
+    if (!_canMove(newPosition)) {
       _beMoveless();
       return;
     }
@@ -113,7 +113,7 @@ with HasWorldReference<Screen> {
       positions: positionInEmu
     );
 
-    if (!_canMove([], newPositions)) {
+    if (!_canMove(newPositions)) {
       moveLock = false;
       return;
     }
@@ -170,7 +170,7 @@ with HasWorldReference<Screen> {
       tetroType: tetroType
     );
 
-    if (!_canMove([], newPositions)) {
+    if (!_canMove(newPositions)) {
       moveLock = false;
       return;
     }
@@ -189,15 +189,8 @@ with HasWorldReference<Screen> {
 
   // NOTE: Check all the details then deciding
   // whether current movement can be executed.
-  bool _canMove(List<double> boundaries, List<int>? position) {
+  bool _canMove(List<int>? position) {
     if (position == null) return false;
-
-    // When initialize tetromino, boundaries can be empty.
-    if (boundaries.isNotEmpty) {
-      if (boundaries[0] > world.borders[1]
-        || boundaries[1] < world.borders[2]
-        || boundaries[2] > world.borders[3]) return false;
-    }
 
     for (final p in position) {
       if (world.tetrisEmulator[p] == 1) return false;
