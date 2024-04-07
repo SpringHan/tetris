@@ -10,6 +10,8 @@ import './display_tetro.dart';
 import './block.dart' show tetrominoMap;
 import './score.dart';
 
+import '../scores_manager.dart';
+
 class Screen extends World {
   // Basic variables.
   bool _running = false;
@@ -298,6 +300,10 @@ class Screen extends World {
       || movingTetro.state == TetrominoState.moveless) return;
 
     movingTetro.rotateBlocks();
+  }
+
+  Future<void> storeCurrentScore() async {
+    await storeNewScore(scoreComponent.score);
   }
 }
 

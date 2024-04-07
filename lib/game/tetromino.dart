@@ -52,6 +52,7 @@ with HasWorldReference<Screen> {
     if (!_canMove(positionInEmu)) {
       remainingBlocks.clear();
       world.changeRunningState();
+      await world.storeCurrentScore();
     }
 
     addAll(blocks);
