@@ -10,20 +10,13 @@ Future<void> storeNewScore(int score) async {
   final file = File(scoreFile);
   String content;
 
-  if (!file.existsSync()) {
-    await file.create();
-    content = "$score";
-  } else {
-    content = await file.readAsString();
-    final scoreList = content.split("\n");
-    scoreList.sort((a, b) => b.toInt().compareTo(a.toInt()));
-    content = scoreList.join("\n");
-  }
-
+  if (!file.existsSync()) await file.create();
+  
+  content = "$score";
   await file.writeAsString(content);
 }
 
-Future<List<int>> fetchScores() async {
+Future<int> fetchScore() async {
   final cacheDirectory = await getExternalStorageDirectory();
   final scoreFile = "${cacheDirectory!.path}/scores.txt";
 
@@ -31,22 +24,10 @@ Future<List<int>> fetchScores() async {
 
   if (!file.existsSync()) {
     await file.create();
-    return [];
+    return 0;
   }
 
   final content = await file.readAsString();
-  final stringList = content.split("\n");
 
-  final List<int> scores = [];
-  for (final s in stringList) {
-    scores.add(s.toInt());
-  }
-
-  return scores;
-}
-
-extension ToInt on String {
-  int toInt() {
-    return int.parse(this);
-  }
+  return int.parse(content);
 }
