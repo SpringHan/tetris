@@ -4,7 +4,7 @@ import 'package:flame/text.dart';
 import 'package:flame/layout.dart';
 import 'package:flame/components.dart';
 
-class Score extends PositionComponent {
+base class Score extends PositionComponent {
   Score({
       required super.size,
       required super.position,
@@ -14,7 +14,6 @@ class Score extends PositionComponent {
 
   int prev = 0;
   int score = 0;
-  double limitTime = 0.5;
 
   @override
   FutureOr<void> onLoad() async {
@@ -46,6 +45,15 @@ class Score extends PositionComponent {
   void onRemove() {
     remove(component);
   }
+}
+
+final class CurrentScore extends Score {
+  CurrentScore({
+      required super.size,
+      required super.position,
+  });
+
+  double limitTime = 0.5;
 
   void increase(int scores) {
     score += scores;
@@ -58,5 +66,24 @@ class Score extends PositionComponent {
   void reset() {
     score = 0;
     limitTime = 0.5;
+  }
+}
+
+final class MaxScore extends Score with HasVisibility {
+  MaxScore({
+      required super.size,
+      required super.position,
+      required int score,
+  }) {
+    super.score = score;
+    isVisible = false;
+  }
+
+  void setScore(int score) {
+    super.score = score;
+  }
+
+  void show(bool show) {
+    isVisible = show;
   }
 }

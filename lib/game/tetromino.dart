@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import './world.dart';
 import './block.dart';
 import './display_tetro.dart';
+import './score.dart' show CurrentScore;
 
 enum TetrominoState {
   falling,
@@ -102,7 +103,7 @@ with HasWorldReference<Screen> {
     }
     positionInEmu = newPosition!;
 
-    delayTime = world.scoreComponent.limitTime;
+    delayTime = (world.scoreComponents[0] as CurrentScore).limitTime;
   }
 
   void updateHorizontal(double horizontalMove) {

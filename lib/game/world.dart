@@ -25,7 +25,8 @@ class Screen extends World {
   List<int> removedLines = []; 
   List<int> blocksBeRemoved = []; // The idx of blocks to be removed.
 
-  late Score scoreComponent;
+  late int maxScore;
+  final List<Score> scoreComponents = [];
   final List<double> borders = [];
   final List<Tetromino> tetrominoList = [];
   DisplayTetromino? nextTetromino;
@@ -36,6 +37,8 @@ class Screen extends World {
 
     blockObjects = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Block")!.objects;
     nextBlockObjects = _backgroundScreen.tileMap.getLayer<ObjectGroup>("NextBlock")!.objects;
+
+    maxScore = await fetchScore();
 
     _initScore();
     _initBorders();
@@ -112,13 +115,18 @@ class Screen extends World {
   }
 
   void _initScore() {
-    final textObject = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Score")!.objects.first;
-    scoreComponent = Score(
-      size: textObject.size,
-      position: textObject.position,
-    );
+    final textObjects = _backgroundScreen.tileMap.getLayer<ObjectGroup>("Score")!.objects;
+    scoreComponents.add(CurrentScore(
+        size: textObjects[0].size,
+        position: textObjects[0].position,
+    ));
+    scoreComponents.add(MaxScore(
+        size: textObjects[1].size,
+        position: textObjects[1].position,
+        score: maxScore,
+    ));
 
-    add(scoreComponent);
+    addAll(scoreComponents);
   }
 
   void _newTetromino() {
@@ -192,7 +200,7 @@ class Screen extends World {
 
     removedLines = fullLines;
     tetrisEmulator = [...emptyBlocks, ...newEmulator];
-    scoreComponent.increase(fullLines.length);
+    (scoreComponents[0] as CurrentScore).increase(fullLines.length);
 
     _running = true;
   }
@@ -263,7 +271,13 @@ class Screen extends World {
     for (final tetro in tetrominoList) {
       if (!tetro.isRemoved) remove(tetro);
     }
-    scoreComponent.reset();
+
+    // Update scores.
+    (scoreComponents[0] as CurrentScore).reset();
+    (scoreComponents[1] as MaxScore).show(false);
+    if (scoreComponents[1].score != maxScore) {
+      scoreComponents[1].score = maxScore;
+    }
 
     if (nextTetromino != null
       && !nextTetromino!.isRemoved) remove(nextTetromino!);
@@ -303,7 +317,12 @@ class Screen extends World {
   }
 
   Future<void> storeCurrentScore() async {
-    await storeNewScore(scoreComponent.score);
+    (scoreComponents[1] as MaxScore).show(true);
+
+    if (scoreComponents[0].score > maxScore) {
+      maxScore = scoreComponents[0].score;
+      await storeNewScore(maxScore);
+    }
   }
 }
 
