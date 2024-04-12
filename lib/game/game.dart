@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/components.dart';
 
 import './world.dart';
 
-class TetrisGame extends FlameGame {
+class TetrisGame extends FlameGame with SingleGameInstance
+{
   late final CameraComponent cam;
   late final Screen backgroundScreen;
 
@@ -22,5 +24,13 @@ class TetrisGame extends FlameGame {
     cam.viewfinder.anchor = Anchor.topLeft;
 
     addAll([cam, backgroundScreen]);
+  }
+
+  @override
+  void onRemove() {
+    removeAll(children);
+    Flame.assets.clearCache();
+    Flame.images.clearCache();
+    super.onRemove();
   }
 }

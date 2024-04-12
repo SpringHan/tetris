@@ -28,6 +28,7 @@ Future<int> fetchScore() async {
   }
 
   final content = await file.readAsString();
+  if (content.isEmpty) return 0;
 
   return int.parse(content);
 }
